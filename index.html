@@ -263,7 +263,20 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: v
 .small { font-size: 13px; color: var(--muted-fg); }
 .team-note { padding: 10px 14px; border-left: 3px solid var(--primary); background: var(--muted); font-size: 13px; color: var(--muted-fg); border-radius: 0 8px 8px 0; }
 
-.loan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 18px; }
+/* 3 cards on top, 2 centered below (inverted triangle) */
+.loan-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 18px; }
+.loan-grid .loan-card { grid-column: span 2; }
+.loan-grid .loan-card:nth-child(4) { grid-column: 2 / span 2; }
+.loan-grid .loan-card:nth-child(5) { grid-column: 4 / span 2; }
+@media (max-width: 900px) {
+  .loan-grid { grid-template-columns: repeat(4, 1fr); }
+  .loan-grid .loan-card, .loan-grid .loan-card:nth-child(4) { grid-column: span 2; }
+  .loan-grid .loan-card:nth-child(5) { grid-column: 2 / span 2; }
+}
+@media (max-width: 620px) {
+  .loan-grid { grid-template-columns: 1fr; }
+  .loan-grid .loan-card, .loan-grid .loan-card:nth-child(4), .loan-grid .loan-card:nth-child(5) { grid-column: auto; }
+}
 .loan-card { padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
 .loan-card h3 { margin: 0 0 6px; font-size: 16px; }
 .loan-card p { margin: 0; font-size: 14px; color: var(--muted-fg); }
