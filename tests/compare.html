@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calculator comparison test</title>
+<style>body{font:14px/1.5 system-ui,sans-serif;margin:16px} iframe{width:1280px;height:900px;border:1px solid #ccc} .pass{color:green} .fail{color:#b00}</style>
+</head>
+<body>
+<!--
+  Runs the same inputs through the original page (../index.html) and the WordPress plugin build
+  (plugin-demo.html) and compares every result field, the amortization tables and the help text.
+  Serve the repo root (python3 -m http.server 8642) and open /tests/compare.html.
+-->
+<h1>Calculator comparison</h1>
+<p id="summary">Running…</p>
+<pre id="out"></pre>
+<iframe id="orig" src="../index.html"></iframe>
+<iframe id="plug" src="plugin-demo.html"></iframe>
+<script>
+(function () {
+  var OUT = ["r-total", "r-total2", "r-loan", "r-interest", "r-rows", "r-extra", "r-town", "r-payoff", "down-help", "type-help", "mi-help", "tax-meta", "m-total"];
+  var INPUTS = ["price", "down", "rate", "term", "type", "town", "taxrate", "ins", "hoa", "mi"];
+
+  function origDriver(w) {
+    var d = w.document;
+    return {
+      w: w,
+      get: function (k) { return d.getElementById(k === "range" ? "price-range" : k); },
+      q: function (sel) { return d.querySelector("#calculator " + sel); },
+      amort: function () { return d.getElementById("amort"); },
+      abody: function () { return d.getElementById("a-body"); }
+    };
+  }
+  function plugDriver(w) {
+    var d = w.document, root = d.querySelector(".macalc[data-macalc]");
+    return {
+      w: w,
+      get: function (k) { return root.querySelector('[data-k="' + k + '"]') || d.querySelector('.mc-mobile-bar [data-k="' + k + '"]'); },
+      q: function (sel) { return root.querySelector(sel); },
+      amort: function () { return root.querySelector('[data-k="amort"]'); },
+      abody: function () { return root.querySelector('[data-k="a-body"]'); }
+    };
+  }
+
+  function fire(drv, el, type) { el.dispatchEvent(new drv.w.Event(type, { bubbles: true })); }
+  var A = {
+    set: function (drv, k, v) { var el = drv.get(k); el.value = v; fire(drv, el, "input"); },
+    blur: function (drv, k) { fire(drv, drv.get(k), "blur"); },
+    select: function (drv, k, v) { var el = drv.get(k); el.value = v; fire(drv, el, "change"); },
+    click: function (drv, sel) { drv.q(sel).click(); },
+    reset: function (drv) { drv.get("reset").click(); },
+    miAuto: function (drv) { drv.get("mi-auto").click(); }
+  };
+
+  var SCENARIOS = [
+    ["Defaults (Canton, 20% conventional)", []],
+    ["FHA at 20% down", [["select", "type", "fha"]]],
+    ["Chip 3% then switch to FHA (forces 3.5%)", [["click", '[data-dp="3"]'], ["select", "type", "fha"]]],
+    ["FHA 15-year, 10% down", [["select", "type", "fha"], ["select", "term", "15"], ["click", '[data-dp="10"]']]],
+    ["VA 0% down in Boston", [["select", "type", "va"], ["set", "down", "0"], ["select", "town", "Boston"]]],
+    ["VA 10% down, 15-year", [["select", "type", "va"], ["click", '[data-dp="10"]'], ["select", "term", "15"]]],
+    ["VA 5% down", [["select", "type", "va"], ["click", '[data-dp="5"]']]],
+    ["Conventional 5%, $850k, Sharon, HOA $350, 20-year", [["set", "price", "850000"], ["click", '[data-dp="5"]'], ["select", "town", "Sharon"], ["set", "hoa", "350"], ["select", "term", "20"]]],
+    ["Conventional 12% down, 10-year (LTV 88)", [["set", "down", "12"], ["select", "term", "10"]]],
+    ["Conventional 3%, $2M (LTV 97)", [["set", "price", "2000000"], ["click", '[data-dp="3"]']]],
+    ["Conventional 2% (below minimum warning)", [["set", "down", "2"]]],
+    ["Manual PMI $120 at 5% down", [["click", '[data-dp="5"]'], ["set", "mi", "120"]]],
+    ["Manual PMI then Use auto", [["click", '[data-dp="5"]'], ["set", "mi", "120"], ["miAuto"]]],
+    ["Manual PMI on VA", [["select", "type", "va"], ["set", "mi", "75"]]],
+    ["Down payment in dollars: $50,000 on $450,000", [["click", '[data-unit="usd"]'], ["set", "price", "450000"], ["set", "down", "50000"]]],
+    ["Dollars unit then 10% chip", [["click", '[data-unit="usd"]'], ["click", '[data-dp="10"]']]],
+    ["Dollars then back to percent", [["click", '[data-unit="usd"]'], ["set", "down", "75000"], ["click", '[data-unit="pct"]']]],
+    ["Other town, custom rate 14.25", [["select", "town", "__other"], ["set", "taxrate", "14.25"]]],
+    ["Quincy with edited rate 12", [["select", "town", "Quincy"], ["set", "taxrate", "12"]]],
+    ["Stoughton (verified rate)", [["select", "town", "Stoughton"]]],
+    ["0% interest", [["set", "rate", "0"]]],
+    ["7.875% with blur formatting", [["set", "rate", "7.875"], ["blur", "rate"], ["set", "price", "712345.67"], ["blur", "price"]]],
+    ["Price slider to $1,250,000", [["set", "range", "1250000"]]],
+    ["Insurance $3,200, HOA $0", [["set", "ins", "3200"]]],
+    ["Price 0", [["set", "price", "0"]]],
+    ["Down > 100%", [["set", "down", "150"]]],
+    ["Reset after changes", [["select", "type", "fha"], ["set", "price", "999000"], ["reset"]]]
+  ];
+
+  function snapshot(drv) {
+    var s = {};
+    OUT.forEach(function (k) { s[k] = drv.get(k).textContent; });
+    INPUTS.forEach(function (k) { s["in:" + k] = drv.get(k).value; });
+    s["mi-badge.hidden"] = drv.get("mi-badge").hidden;
+    s["mi-auto.hidden"] = drv.get("mi-auto").hidden;
+    s["chips"] = Array.prototype.map.call(drv.w.document.querySelectorAll("[data-dp]"), function (b) { return b.getAttribute("aria-pressed"); }).join(",");
+    s["stack"] = Array.prototype.map.call(drv.get("r-stack").children, function (c) { return parseFloat(c.style.width).toFixed(6); }).join(",");
+    var am = drv.amort();
+    am.open = true; fire(drv, am, "toggle");
+    s["amort-yearly"] = drv.abody().textContent;
+    drv.q('[data-view="month"]').click();
+    s["amort-monthly"] = drv.abody().textContent;
+    drv.q('[data-view="year"]').click();
+    am.open = false;
+    return s;
+  }
+
+  function run(o, p) {
+    var lines = [], fails = 0, checks = 0, samples = [];
+    SCENARIOS.forEach(function (sc) {
+      [o, p].forEach(function (drv) {
+        A.reset(drv);
+        sc[1].forEach(function (step) { A[step[0]].apply(null, [drv].concat(step.slice(1))); });
+      });
+      var so = snapshot(o), sp = snapshot(p), bad = [];
+      Object.keys(so).forEach(function (k) { checks++; if (so[k] !== sp[k]) bad.push(k + "\n    original: " + JSON.stringify(so[k]).slice(0, 300) + "\n    plugin:   " + JSON.stringify(sp[k]).slice(0, 300)); });
+      fails += bad.length;
+      lines.push((bad.length ? "FAIL " : "PASS ") + sc[0] + "  →  " + so["r-total"] + " | loan " + so["r-loan"] + " | interest " + so["r-interest"] + (bad.length ? "\n  " + bad.join("\n  ") : ""));
+    });
+    var sum = document.getElementById("summary");
+    sum.textContent = (fails ? "RESULT: FAIL" : "RESULT: PASS") + " — " + SCENARIOS.length + " scenarios, " + checks + " field comparisons, " + fails + " mismatches";
+    sum.className = fails ? "fail" : "pass";
+    document.getElementById("out").textContent = lines.join("\n");
+  }
+
+  var loaded = 0;
+  function ready() {
+    if (++loaded < 2) return;
+    setTimeout(function () {
+      try { run(origDriver(document.getElementById("orig").contentWindow), plugDriver(document.getElementById("plug").contentWindow)); }
+      catch (e) { document.getElementById("summary").textContent = "RESULT: ERROR " + e.message + "\n" + e.stack; }
+    }, 300);
+  }
+  document.getElementById("orig").addEventListener("load", ready);
+  document.getElementById("plug").addEventListener("load", ready);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "RealEstateAgent",
+      "name": "The Mikel DeFrancesco Team - William Raveis Real Estate",
+      "telephone": "{{SCHEMA_PHONE}}",
+      "url": "{{HOME_URL}}",
+      "address": { "@type": "PostalAddress", "addressLocality": "Canton", "addressRegion": "MA", "addressCountry": "US" }
+    },
+    {
+      "@type": "WebApplication",
+      "name": "Massachusetts Mortgage Calculator",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "url": "{{PAGE_URL}}",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "How accurate is a Massachusetts mortgage calculator?", "acceptedAnswer": { "@type": "Answer", "text": "It is a solid estimate when you use a real interest rate quote and the correct town tax rate. Your final payment depends on your loan terms, insurance quote and assessed value." } },
+        { "@type": "Question", "name": "Does this mortgage calculator include Massachusetts property taxes?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Choose your town and the calculator loads its residential tax rate. Taxes vary a lot between towns, so always check the specific town." } },
+        { "@type": "Question", "name": "How much do I need to make to buy a house in Quincy or Canton?", "acceptedAnswer": { "@type": "Answer", "text": "It depends on price, down payment and debts. Many lenders look for total housing costs around 28% to 31% of gross monthly income, with total debts under roughly 43% to 50% depending on the loan. Run your target price above, then talk to a loan officer about your situation." } },
+        { "@type": "Question", "name": "Can I use an FHA loan to buy a condo in Massachusetts?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, if the condo building is FHA approved. Ask your agent to check approval status before you make an offer." } },
+        { "@type": "Question", "name": "How much is a down payment on a first home in Massachusetts?", "acceptedAnswer": { "@type": "Answer", "text": "Conventional loans can start at 3% down for eligible first-time buyers, and FHA at 3.5%. MassHousing and other programs may help with down payment costs." } },
+        { "@type": "Question", "name": "Should I get pre-approved before talking to an agent?", "acceptedAnswer": { "@type": "Answer", "text": "You can do either first. Many buyers talk to Mikel's team early, then get pre-approved through William Raveis Mortgage so the search and the financing line up." } }
+      ]
+    }
+  ]
+}

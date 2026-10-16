@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full page demo</title>
+<!-- Renders templates/page.html with the same placeholder values macalc_render_page() uses, inside a
+     container sized like the live page's boxed Elementor container. Add ?hostile for theme-like styles. -->
+<link rel="stylesheet" href="../wordpress-plugin/massachusetts-calculator/assets/css/massachusetts-calculator.css">
+<script>if (/[?&]hostile/.test(location.search)) document.write('<link rel="stylesheet" href="hostile-theme.css">');</script>
+<style>body { margin: 0; } .e-con-inner { max-width: 1140px; margin: 0 auto; padding: 0 10px; }</style>
+</head>
+<body class="elementor-kit-5">
+<div class="e-con-inner" id="mount"></div>
+<div id="contact" style="background:#5582b447;padding:90px 20px;text-align:center;font-family:Helvetica,Arial,sans-serif">(Live site's "Get In Touch" contact section)</div>
+<script>
+  var config = { defaults: { price: 600000, downPct: 20, rate: 6.25, term: 30, type: "conv", town: "Canton", ins: 1800, hoa: 0 },
+    phone: "(617) 755-8272", phoneHref: "+16177558272", scheduleUrl: "#contact", contactUrl: "#contact", amortization: true, disclaimer: true };
+  var calc = '<div class="macalc" data-macalc="' + JSON.stringify(config).replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '"></div>';
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "../wordpress-plugin/massachusetts-calculator/templates/page.html", false); xhr.send();
+  var schemaReq = new XMLHttpRequest();
+  schemaReq.open("GET", "../wordpress-plugin/massachusetts-calculator/templates/schema.json", false); schemaReq.send();
+  var schema = schemaReq.responseText.replace("{{SCHEMA_PHONE}}", "+1-617-755-8272").replace("{{HOME_URL}}", "https://mikeldefrancesco.com/").replace("{{PAGE_URL}}", "https://mikeldefrancesco.com/massachusetts-mortgage-calculator/");
+  var map = {
+    "{{CALCULATOR}}": calc, "{{PHONE}}": "(617) 755-8272", "{{TEL}}": "tel:+16177558272", "{{SCHEDULE_URL}}": "#contact", "{{CONTACT_URL}}": "#contact",
+    "{{HOME_URL}}": "https://mikeldefrancesco.com/", "{{PROCEEDS_URL}}": "https://mikeldefrancesco.com/massachusetts-home-sale-proceeds-calculator/",
+    "{{UPDATED}}": '<p class="mcp-updated">Last updated: October 17, 2026</p>',
+    "{{SCHEMA}}": '<script type="application/ld+json">' + schema + "<\/script>"
+  };
+  var html = xhr.responseText.replace(/\{\{[A-Z_]+\}\}/g, function (k) { return k in map ? map[k] : k; });
+  document.getElementById("mount").innerHTML = html;
+</script>
+<script src="../wordpress-plugin/massachusetts-calculator/assets/js/massachusetts-calculator.js"></script>
+<script>
+  // ?click=Quincy simulates clicking a town in the tax table.
+  var m = /[?&]click=([^&]+)/.exec(location.search);
+  if (m) addEventListener("load", function () { document.querySelector('[data-macalc-taxtable] button[data-town="' + decodeURIComponent(m[1]) + '"]').click(); });
+</script>
+</body>
+</html>

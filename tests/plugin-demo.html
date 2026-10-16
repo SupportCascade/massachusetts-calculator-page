@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plugin demo</title>
+<!-- What the plugin prints: the compiled CSS/JS and the container from [massachusetts_calculator] with default settings. -->
+<link rel="stylesheet" href="../wordpress-plugin/massachusetts-calculator/assets/css/massachusetts-calculator.css">
+<script>if (/[?&]hostile/.test(location.search)) document.write('<link rel="stylesheet" href="hostile-theme.css">');</script>
+<style>body { margin: 0; } .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; } @media (max-width: 620px) { .wrap { padding: 0 16px; } }</style>
+</head>
+<body class="elementor-kit-5">
+<div class="wrap">
+  <div class="macalc" data-macalc="{&quot;defaults&quot;:{&quot;price&quot;:600000,&quot;downPct&quot;:20,&quot;rate&quot;:6.25,&quot;term&quot;:30,&quot;type&quot;:&quot;conv&quot;,&quot;town&quot;:&quot;Canton&quot;,&quot;ins&quot;:1800,&quot;hoa&quot;:0},&quot;phone&quot;:&quot;(617) 755-8272&quot;,&quot;phoneHref&quot;:&quot;+16177558272&quot;,&quot;scheduleUrl&quot;:&quot;#contact&quot;,&quot;contactUrl&quot;:&quot;#contact&quot;,&quot;amortization&quot;:true,&quot;disclaimer&quot;:true}"></div>
+</div>
+<script src="../wordpress-plugin/massachusetts-calculator/assets/js/massachusetts-calculator.js"></script>
+<script>if (/[?&]open/.test(location.search)) addEventListener("load", function () { var a = document.querySelector('[data-k="amort"]'); a.open = true; a.dispatchEvent(new Event("toggle")); });</script>
+</body>
+</html>
