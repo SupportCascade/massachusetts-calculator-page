@@ -83,8 +83,7 @@ function mmc_tel( $phone ) {
 /* ------------------------------------------------------------------ */
 
 add_action( 'wp_enqueue_scripts', function () {
-	wp_register_style( 'mmc-inter', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap', array(), null );
-	wp_register_style( 'mmc', plugins_url( 'assets/css/ma-mortgage-calculator.css', __FILE__ ), array( 'mmc-inter' ), MMC_VERSION );
+	wp_register_style( 'mmc', plugins_url( 'assets/css/ma-mortgage-calculator.css', __FILE__ ), array(), MMC_VERSION );
 	wp_register_script( 'mmc', plugins_url( 'assets/js/ma-mortgage-calculator.js', __FILE__ ), array(), MMC_VERSION, true );
 } );
 
